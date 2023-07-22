@@ -1,0 +1,20 @@
+{
+  // 保存自动格式化
+  "editor.formatOnSave": true,
+  // 格式化配置
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[njk]": {
+    "editor.defaultFormatter": "eseom.nunjucks-template"
+  },
+
+  "vsicons.associations.files": [{ "icon": "html", "extensions": ["html"], "format": "svg" }],
+  "nunjucksTemplate.preserveEmptyLine": 3,
+  "emmet.includeLanguages": {
+    "njk": "html"
+  },
+  "files.associations": {
+    "**/views/**/*.html": "njk"
+  }
+}

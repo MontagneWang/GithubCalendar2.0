@@ -1,0 +1,6 @@
+.vscode
+.prettierignore
+.prettierrc.yaml
+nginx伪静态.txt
+nodemon.json
+pm2.yaml

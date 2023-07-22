@@ -1,0 +1,7 @@
+{
+  "verbose": true,
+  "delay": 1000,
+  "ignore": ["./node-ip2region", "./public", "./node_modules"],
+  "watch": ["./"],
+  "ext": "js,html"
+}
