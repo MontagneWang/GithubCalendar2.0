@@ -51,10 +51,8 @@ async function getdata(name) {
 
   //   console.log(res);
   const $ = cheerio.load(res);
-  // const data = $('#user-profile-frame > div > div.mt-4.position-relative > div.js-yearly-contributions > div > div > div > div:nth-child(1)  table > tbody > tr');
-  const data = $(
-    '#user-profile-frame table > tbody > tr'
-  );
+  const data = $('#user-profile-frame > div > div.mt-4.position-relative > div.js-yearly-contributions > div > div > div > div:nth-child(1)  table > tbody > tr');
+
   let contributions = [];
   let total = 0;
   for (let i = 0; i < data.length; i++) {
