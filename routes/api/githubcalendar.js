@@ -91,12 +91,8 @@ async function getdata(name) {
   });
 
   return {
-    res:res,
-    data:data,
-    data2:data2,
-    countBefore:countBefore,
     total: total,
-    contributions: list_split(sortedData, 7),
+    contributions: data2,
     code: 200,
     message: "ok",
   };
