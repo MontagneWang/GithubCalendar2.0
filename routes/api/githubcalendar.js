@@ -1,20 +1,20 @@
-const router = require("koa-router")();
-const axios = require("axios");
-const https = require("https");
-const cheerio = require("cheerio");
-const dayjs = require("dayjs");
-const config = require("../../config/config");
+const router = require('koa-router')();
+const axios = require('axios');
+const https = require('https');
+const cheerio = require('cheerio');
+const dayjs = require('dayjs');
+const config = require('../../config/config');
 
-router.prefix("/api");
+router.prefix('/api');
 
-router.get("/githubcalendar/api", async (ctx, next) => {
+router.get('/githubcalendar/api', async (ctx, next) => {
   const user = Object.keys(ctx.request.query)[0];
   if (!user) {
     return;
   }
   // 读取缓存
   let data = global.cacheLRU.get(`githubcalendar:${user}`);
-  if ((data ?? "") !== "") {
+  if ((data ?? '') !== '') {
     return (ctx.body = data);
   }
 
@@ -23,7 +23,7 @@ router.get("/githubcalendar/api", async (ctx, next) => {
   // 获取成功,设置缓存
   if (data.code === 200) {
     global.cacheLRU.set(`githubcalendar:${user}`, data, {
-      ttl: config.githubcalendar ? config.githubcalendar : 1000 * 60 * 10, //缓存时间(ms)
+      ttl: config.githubcalendar ? config.githubcalendar : 1000 * 60 * 10 //缓存时间(ms)
     });
   }
 
@@ -34,53 +34,47 @@ router.get("/githubcalendar/api", async (ctx, next) => {
 async function getdata(name) {
   // 忽略证书
   const agent = new https.Agent({
-    rejectUnauthorized: false,
+    rejectUnauthorized: false
   });
   let { data: res } = await axios
-    .get("https://github.com/" + name, { httpsAgent: agent })
-    .catch((err) => err);
+    .get('https://github.com/' + name, { httpsAgent: agent })
+    .catch(err => err);
 
   if (!res) {
     return {
       total: 0,
       contributions: [],
       code: 201,
-      message: "请求失败",
+      message: '请求失败'
     };
   }
 
   //   console.log(res);
   const $ = cheerio.load(res);
   const data = $(
-    "#user-profile-frame > div > div.mt-4.position-relative > div.js-yearly-contributions > div > div > div > div:nth-child(1)  table > tbody > tr"
+    '#user-profile-frame > div > div.mt-4.position-relative > div.js-yearly-contributions > div > div > div > div:nth-child(1)  table > tbody > tr'
   );
-
   let contributions = [];
   let total = 0;
-
-  let data2;
-  let countBefore;
-
   for (let i = 0; i < data.length; i++) {
-    data2 = $(data[i]).children("td");
-
+    const data2 = $(data[i]).children('td');
     for (let j = 0; j < data2.length; j++) {
       // console.log($(data2[j]).attr('data-date'));
-      // console.log($(data2[j]).attr('data-level'));
+      //   console.log($(data2[j]).attr('data-level'));
+      const githubcalendarId = $(data2[j]).attr('id');
+      if (githubcalendarId) {
+        let count = $(`tool-tip[for="${githubcalendarId}"]`)
+          .text()
+          .replace(/^(.*) contribution(.*)$/, '$1');
+        count = count === 'No' ? 0 : Number(count);
 
-      countBefore = $(data2[j])
-        .text()
-        .replace(/^(.*) contribution(.*)$/, "$1");
-
-      count = countBefore === "No" ? 0 : Number(count);
-
-      if (!isNaN(count) && $(data2[j]).attr("data-date")) {
-        total += count;
-
-        contributions.push({
-          date: $(data2[j]).attr("data-date"),
-          count: count,
-        });
+        if (!isNaN(count) && $(data2[j]).attr('data-date')) {
+          total += count;
+          contributions.push({
+            date: $(data2[j]).attr('data-date'),
+            count: count
+          });
+        }
       }
     }
   }
@@ -92,9 +86,9 @@ async function getdata(name) {
 
   return {
     total: total,
-    contributions: data2,
+    contributions: list_split(sortedData, 7),
     code: 200,
-    message: "ok",
+    message: 'ok'
   };
 }
 
