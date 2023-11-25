@@ -40,9 +40,6 @@ async function getdata(name) {
     .get("https://github.com/" + name, { httpsAgent: agent })
     .catch((err) => err);
 
-  console.log("通过url获取的数据");
-  console.log(res);
-
   if (!res) {
     return {
       total: 0,
@@ -58,41 +55,27 @@ async function getdata(name) {
     "#user-profile-frame > div > div.mt-4.position-relative > div.js-yearly-contributions > div > div > div > div:nth-child(1)  table > tbody > tr"
   );
 
-  console.log("通过css选择器后筛选的数据");
-  console.log(data);
-
   let contributions = [];
   let total = 0;
-  for (let i = 0; i < data.length; i++) {
-    const data2 = $(data[i]).children("td");
 
-    console.log("筛选的td数据");
-    console.log(data2);
+  let data2;
+  let countBefore;
+
+  for (let i = 0; i < data.length; i++) {
+    data2 = $(data[i]).children("td");
 
     for (let j = 0; j < data2.length; j++) {
       // console.log($(data2[j]).attr('data-date'));
       // console.log($(data2[j]).attr('data-level'));
 
-      let count = $(data2[j])
+      countBefore = $(data2[j])
         .text()
         .replace(/^(.*) contribution(.*)$/, "$1");
 
-      console.log("正则筛选后的数据");
-      console.log(count);
-
-      count = count === "No" ? 0 : Number(count);
-
-      console.log("类型转换后的数据");
-      console.log(count);
+      count = countBefore === "No" ? 0 : Number(count);
 
       if (!isNaN(count) && $(data2[j]).attr("data-date")) {
         total += count;
-
-        console.log("写入贡献的每天数据");
-        console.log({
-          date: $(data2[j]).attr("data-date"),
-          count: count,
-        });
 
         contributions.push({
           date: $(data2[j]).attr("data-date"),
@@ -108,6 +91,10 @@ async function getdata(name) {
   });
 
   return {
+    res,
+    data,
+    data2,
+    countBefore,
     total: total,
     contributions: list_split(sortedData, 7),
     code: 200,
